@@ -8,6 +8,9 @@ bun install
 bun run dev        # http://localhost:3001
 ```
 
+No list of your own at hand? Try [test/fixtures/sample.kmz](test/fixtures/sample.kmz), a few famous places in the same
+format.
+
 - **Library**: add lists by choosing or dropping a file (a copy is kept in the browser's IndexedDB) or by path on
   this computer (only the path is kept, and the file is re-read on every open, so re-exporting to the same place
   updates the map). The library, the open list and each list's last map view live in localStorage.

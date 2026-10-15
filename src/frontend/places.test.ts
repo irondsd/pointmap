@@ -2,14 +2,19 @@ import { expect, test } from "bun:test";
 import { category, decodeOrganicMaps, kmlColor, organicMapsUrl, otherNames, typeLabel, type Place } from "./places";
 import { isZip, listEntries, readEntry } from "./zip";
 
-test("reads the kml out of an Organic Maps .kmz", async () => {
-  const bytes = new Uint8Array(await Bun.file(new URL("../../Konstantin's list.kmz", import.meta.url)).arrayBuffer());
+const FIXTURES = new URL("../../test/fixtures/", import.meta.url);
+
+test("reads the kml out of a .kmz", async () => {
+  const bytes = await Bun.file(new URL("sample.kmz", FIXTURES)).bytes();
   expect(isZip(bytes)).toBe(true);
   const entries = listEntries(bytes);
-  expect(entries.map((e) => e.name)).toEqual(["Konstantin's list.kml"]);
+  expect(entries.map((e) => e.name)).toEqual(["sample.kml"]);
   const xml = new TextDecoder().decode(await readEntry(bytes, entries[0]!));
-  expect(xml.startsWith("<?xml")).toBe(true);
-  expect(xml.match(/<Placemark>/g)?.length).toBe(1920);
+  expect(xml).toBe(await Bun.file(new URL("sample.kml", FIXTURES)).text());
+});
+
+test("tells a .kml from a .kmz", async () => {
+  expect(isZip(await Bun.file(new URL("sample.kml", FIXTURES)).bytes())).toBe(false);
 });
 
 test("labels feature types", () => {
@@ -40,11 +45,11 @@ test("converts KML aabbggrr colors", () => {
 
 test("lists other names, reader's language first, without repeats", () => {
   const place = {
-    name: "Ухта",
-    names: { default: "Ухта", ja: "ウフタ", int_name: "Ukhta", en: "Ukhta" },
+    name: "Eiffel Tower",
+    names: { default: "Tour Eiffel", en: "Eiffel Tower", ja: "エッフェル塔", int_name: "Tour Eiffel" },
   } as unknown as Place;
-  expect(otherNames(place, ["ja-JP"])).toEqual(["ウフタ", "Ukhta"]);
-  expect(otherNames(place, ["ru"])).toEqual(["Ukhta"]);
+  expect(otherNames(place, ["ja-JP"])).toEqual(["エッフェル塔", "Tour Eiffel"]);
+  expect(otherNames(place, ["fr"])).toEqual(["Tour Eiffel"]);
 });
 
 test("Organic Maps links round-trip through the ge0 encoding", () => {

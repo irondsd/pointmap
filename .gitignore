@@ -36,3 +36,9 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 .playwright-mcp
 
 .vercel
+
+# Place lists are personal; only the made-up fixtures are committed.
+*.kmz
+*.kml
+!test/fixtures/*.kmz
+!test/fixtures/*.kml
